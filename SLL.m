@@ -10,4 +10,10 @@ for i=1:length(max_local_i)
     max_values(i) = AF(max_local_i(i));
 end
 
-results= sort(max_values, 'descend');
+results = sort(max_values, 'descend');
+
+if(length(results) < 2) 
+    results = 0;
+else
+results = results(1) - results(2);
+end

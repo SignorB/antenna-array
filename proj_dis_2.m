@@ -2,11 +2,10 @@ spacing = [5.06458333300000e-06	5.97187500000000e-06	5.33541666700000e-06	6.3645
 
 
 %%
-theta_fixed = 0;%16.38/180 * pi
+theta_fixed = 0;
 a = -pi;
 b = pi ;
-
-
+delta_lin = 0;
 
 %%
 N = 64;
@@ -25,7 +24,6 @@ position_avg(1) = 0;
 for i=2:length(spacing)
     position_avg(i) = position_avg(i-1) + spacing_avg;
 end
-
 
 lambda = 1550e-9;
 grid = a:2*pi/10000:b; 
@@ -51,29 +49,23 @@ end
 
 objective = @ (x) objective_lobes(x, k, position, theta_fixed);
 
-options = optimoptions('particleswarm', ...
-    'Display', 'iter');
+options = optimoptions('particleswarm', 'Display', 'iter');
 delta = particleswarm(objective, N, lb, ub, options);
+
 
 AF_linear = array_factor_min(k, position, grid, delta);
 AF_dB = 20 * log10(abs(AF_linear));
-AF_dB = AF_dB - max(AF_dB);  % Normalizza a 0 dB
-AF = 10.^(AF_dB./20);
+AF_dB_norm = AF_dB - max(AF_dB);  % Normalizza a 0 dB
+AF = 10.^(AF_dB_norm./20);
 
-%%
-delta_lin = pi/8;
+%% 
+
 AF_linear = array_factor(k, position, grid, delta_lin, length(spacing));
 AF_linear_avg = array_factor(k, position_avg, grid, delta_lin, length(spacing));
 
 AF_dB_avg = 20 * log10(abs(AF_linear_avg));
-AF_dB_avg = AF_dB_avg - max(AF_dB_avg);  % Normalizza a 0 dB
-AF_avg = 10.^(AF_dB_avg./20);
-
-
-
-
-
-
+AF_dB_avg_norm = AF_dB_avg - max(AF_dB_avg);  % Normalizza a 0 dB
+AF_avg = 10.^(AF_dB_avg_norm./20);
 
 %%
 
@@ -86,9 +78,42 @@ ylim([0 1])
 legend('non unf', 'unif')
 xlabel('Angolo (gradi)')
 ylabel('Intensità')
-title('Array Factor (cartesiano)')
+title('Array Factor (normalizzato)')
 
 figure(2)
-polarplot(grid, max(AF_dB, -30))  % Tronca a -30 dB per evitare -Inf
+polarplot(grid, max(AF_dB_norm, -30)) 
 rlim([-30 0])
-title('Array Factor (diagramma polare 360°)')
+title('Array Factor ottimizzato (normalizzato)')
+
+figure(3)
+hold on
+plot(grid * 180 / pi, max(AF_dB, -20), '-b')
+plot(grid * 180 / pi, max(AF_dB_avg, -20), '--r')
+legend('non unf', 'unif')
+title('Array Factor ')
+xlabel('Angolo (gradi)')
+ylabel('Array Factor [dB]')
+xlim([-15 15])
+
+%% Dipedenza dello steering dalla fase
+
+grid = a:2*pi/10000:b; 
+
+fasi = [0, pi / 2, 3/2 * pi, pi];
+AF_dB_steering = zeros(length(fasi), length(grid));
+for i=1:length(fasi)
+    delta_lin = fasi(i);
+
+    AF = array_factor(k, position_avg, grid, delta_lin, length(spacing));
+    AF_dB_steering(i, :) = 20 * log10(abs(AF));
+end
+
+
+figure(4)
+hold on
+plot(grid * 180/pi, max(AF_dB_steering(1, :), -30))
+plot(grid * 180/pi, max(AF_dB_steering(2, :), -30))
+plot(grid * 180/pi, max(AF_dB_steering(3, :), -30))
+plot(grid * 180/pi, max(AF_dB_steering(4, :), -30))
+xlim([-15 15])
+title('Dipendenza dello steering dalla fase')
