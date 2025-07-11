@@ -109,13 +109,14 @@ figure(1)
 plot(grid*180/pi, abs(AF_opt_norm), 'b-', 'LineWidth', 2); 
 hold on;
 plot(grid*180/pi, abs(AF_uniform_norm), 'r--');
+plot(grid*180/pi, abs(AF_nonuniform_norm), 'g-');
 xline(theta_fixed*180/pi, 'k--', 'Target');
 xlim([-90 90]); 
 ylim([0 1.1]);
 xlabel('Angolo [°]');
 ylabel('|Array Factor|');
 title('Confronto Array Factor (Lineare)');
-legend('Ottimizzato', 'Uniforme');
+legend('Ottimizzato', 'Uniforme', 'Non Uniforme');
 
 
 figure(2)
@@ -126,6 +127,7 @@ AF_nonuniform_dB = 20*log10(abs(AF_nonuniform_norm));
 plot(grid*180/pi, AF_opt_dB, 'b-'); 
 hold on;
 plot(grid*180/pi, AF_uniform_dB, 'r--');
+plot(grid*180/pi, AF_nonuniform_dB, 'g-');
 yline(-20, 'k:', '-20dB'); 
 yline(-3, 'k:', '-3dB');
 xlim([-90 90]); 
@@ -133,7 +135,7 @@ ylim([-40 5]);
 xlabel('Angolo [°]'); 
 ylabel('Array Factor [dB]');
 title('Confronto Array Factor (dB)');
-legend('Ottimizzato', 'Uniforme', 'Location', 'best');
+legend('Ottimizzato', 'Uniforme', 'Non Uniforme', 'Location', 'best');
 
 figure(3)
 polarplot(grid, max(AF_opt_dB, -30), 'b-');
@@ -147,3 +149,5 @@ xline(theta_fixed*180/pi, 'k--', 'Target');
 xlabel('Angolo [°]'); ylabel('|Array Factor|');
 title('Zoom Zona Target (±30°)');
 legend('Ottimizzato', 'Uniforme');
+
+sgtitle('Analisi Array di Antenne');
