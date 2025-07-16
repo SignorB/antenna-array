@@ -85,8 +85,11 @@ options = optimoptions('particleswarm', ...
     'SelfAdjustmentWeight', 1.49, ...
     'SocialAdjustmentWeight', 1.49);
 
+%% Togliere il commento dalla riga sotto per ottimizzare secondo i parametri forniti
 % [delta_opt, fval] = particleswarm(objective_func,N,  lb, ub, options);
-delta_opt = delta_opt_picco;
+%% Togliere il comento dalla riga sotto per utilizzare le fasi precalcolate
+% delta_opt = delta_opt_picco;
+% delta_opt = delta_opt_sll;
 
 if (theta_fixed ~= theta_new)
     phase_shift = k * position_nonuniform * (sin(theta_fixed)- sin(theta_new));
